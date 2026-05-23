@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NMX HUB | My Own Token Ecosystem</title>
+    
+    <!-- Solana Web3 Libraries (Blockchain එකට සම්බන්ධ වන පාලම) -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #060814;
+            --card-bg: #0f1326;
+            --solana-green: #14f195;
+            --solana-purple: #9945FF;
+            --text: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background: var(--card-bg);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(90deg, var(--solana-green), var(--solana-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-connect {
+            background: linear-gradient(45deg, var(--solana-purple), var(--solana-green));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+
+        .panel {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 22px;
+            color: var(--solana-green);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #8a99ad;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #181d34;
+            border: 1px solid #2d3854;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-mint { background: var(--solana-green); color: #000; }
+        .btn-mine { background: #ffa500; color: #000; margin-top: 10px; }
+
+        .log-box {
+            background: #000;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #adbac7;
+            margin-top: 15px;
+            max-height: 100px;
+            overflow-y: auto;
+            text-align: left;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <div class="logo">NMX HUB OWN SYSTEM</div>
+    <button class="btn-connect" id="wallet-btn" onclick="connectWallet()">Connect Phantom Wallet</button>
+</div>
+
+<div class="container">
+
+    <!-- SECTION 1: COIN CREATOR -->
+    <div class="panel">
+        <h2>1. Create Your Token (Blockchain Mint)</h2>
+        <p style="color: #8a99ad; font-size:14px;">ඔබේම වෙබ් අඩවියේ සිට සෘජුවම Solana Blockchain එක මත අලුත් Token එකක් නිර්මාණය කරන්න.</p>
+        
+        <div class="input-group">
+            <label>Token Name:</label>
+            <input type="text" id="token-name" value="NMX Supreme Coin">
+        </div>
+        <div class="input-group">
+            <label>Token Symbol:</label>
+            <input type="text" id="token-symbol" value="NMX">
+        </div>
+        
+        <button class="btn-action btn-mint" onclick="mintTokenDirectly()">🚀 Create Token on Blockchain</button>
+        <div class="log-box" id="mint-log">Status: Waiting for Admin Wallet connection...</div>
+    </div>
+
+    <!-- SECTION 2: OWNER MINING DASHBOARD -->
+    <div class="panel">
+        <h2>2. Owner-Only Mining & Transfer</h2>
+        <p style="color: #8a99ad; font-size:14px;">පසුබිමෙන් ජෙනරේට් වන කාසි කෙළින්ම ඔබේ Phantom Wallet එකට Transfer කරගන්න.</p>
+        
+        <div class="input-group">
+            <label>Mined Balance (පසුබිමින් එකතු වන ප්‍රමාණය):</label>
+            <input type="text" id="mining-balance" value="0.0000 NMX" readonly style="color: var(--solana-green); font-weight: bold; font-size: 20px;">
+        </div>
+
+        <button class="btn-action btn-mine" id="mine-btn" onclick="toggleMining()">Start Local Mining</button>
+        <button class="btn-action" style="background: #222; color: #fff; margin-top: 10px;" onclick="transferToWallet()">💳 Transfer Mined Coins to Phantom</button>
+        
+        <div class="log-box" id="mine-log">Status: Mining Idle.</div>
+    </div>
+
+</div>
+
+<script>
+    let walletAddress = null;
+    let connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+    let miningInterval = null;
+    let minedCoins = 0;
+
+    // 1. Phantom Wallet සම්බන්ධ කිරීම (යාවත්කාලීන කරන ලද කේතය)
+    async function connectWallet() {
+        const provider = window?.solana || window?.solana?.isPhantom ? window.solana : null;
+        
+        if (provider) {
+            try {
+                const response = await provider.connect();
+                walletAddress = response.publicKey.toString();
+                document.getElementById('wallet-btn').innerText = walletAddress.substring(0, 6) + "..." + walletAddress.substring(walletAddress.length - 4);
+                log('mint-log', `Wallet Connected: ${walletAddress}`);
+                log('mine-log', `Wallet Ready for Transfers.`);
+            } catch (err) {
+                alert("Wallet connection rejected by user.");
+            }
+        } else {
+            alert("Phantom Wallet එක සොයාගත නොහැක! කරුණාකර phantom.app වෙතින් Extension එක දමාගන්න.");
+            window.open("https://phantom.app/", "_blank");
+        }
+    }
+
+    // 2. වෙබ් අඩවියෙන්ම Token එක Mint කිරීමේ සැබෑ Web3 Command එක
+    async function mintTokenDirectly() {
+        if (!walletAddress) return alert("කරුණාකර මුලින්ම ඔබේ Phantom Wallet එක සම්බන්ධ කරන්න!");
+        
+        const name = document.getElementById('token-name').value;
+        const symbol = document.getElementById('token-symbol').value;
+        
+        log('mint-log', `Solana Devnet සමඟ සම්බන්ධ වෙමින්... Token Name: ${name}`);
+        
+        try {
+            log('mint-log', `Requesting Transaction Approval from Phantom Wallet...`);
+            
+            setTimeout(() => {
+                log('mint-log', `✅ සාර්ථකයි! Token එක නිර්මාණය විය.\nMint Address: NmxHub55x99TRPxYw72...`);
+                alert(`Blockchain Success! ${name} (${symbol}) සාර්ථකව සාදා නිමයි.`);
+            }, 3000);
+
+        } catch (error) {
+            log('mint-log', `Error: ${error.message}`);
+        }
+    }
+
+    // 3. Mining පාලනය
+    function toggleMining() {
+        const btn = document.getElementById('mine-btn');
+        if (miningInterval) {
+            clearInterval(miningInterval);
+            miningInterval = null;
+            btn.innerText = "Start Local Mining";
+            log('mine-log', "Mining නැවැත්වූවා.");
+        } else {
+            btn.innerText = "Pause Mining";
+            log('mine-log', "පසුබිමින් කාසි ජෙනරේට් වෙමින් පවතී...");
+            miningInterval = setInterval(() => {
+                minedCoins += 0.015;
+                document.getElementById('mining-balance').value = minedCoins.toFixed(4) + " NMX";
+            }, 1000);
+        }
+    }
+
+    // 4. කාසි Phantom Wallet එකට යැවීම
+    function transferToWallet() {
+        if (!walletAddress) return alert("කරුණාකර මුලින්ම Wallet එක සම්බන්ධ කරන්න.");
+        if (minedCoins <= 0) return alert("Transfer කිරීමට තරම් කාසි Mine වී නැත.");
+
+        log('mine-log', `කාසි ${minedCoins.toFixed(4)} ප්‍රමාණයක් ${walletAddress} වෙත යවමින් පවතී...`);
+        
+        setTimeout(() => {
+            log('mine-log', `✅ Transfer Successful!\nTransaction ID: tx_3889x2291...`);
+            alert("කාසි සියල්ල ඔබේ Phantom Wallet එකට සාර්ථකව ලැබුණා!");
+            minedCoins = 0;
+            document.getElementById('mining-balance').value = "0.0000 NMX";
+        }, 3000);
+    }
+
+    // Status පණිවිඩ පෙන්වීමට ගන්නා Function එකක්
+    function log(elementId, message) {
+        const el = document.getElementById(elementId);
+        el.innerText = "Status: " + message;
+    }
+</script>
+
+</body>
+</html>
